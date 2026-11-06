@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block title %}User Profile - Smart Canteen{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center my-4">
+    <div class="col-md-6 col-lg-5">
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-4 text-center">
+                <div class="bg-secondary-subtle text-secondary d-inline-block p-4 rounded-circle mb-3">
+                    <i class="bi bi-person-circle fs-1"></i>
+                </div>
+                <h4 class="fw-bold mb-1">{{ user.get_full_name|default:user.username }}</h4>
+                <span class="badge bg-primary mb-3">{{ user.get_role_display }}</span>
+
+                <div class="list-group list-group-flush text-start my-3">
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <span class="text-muted"><i class="bi bi-envelope me-2"></i>Email</span>
+                        <span class="fw-semibold">{{ user.email|default:"Not specified" }}</span>
+                    </div>
+                    {% if user.student_profile %}
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <span class="text-muted"><i class="bi bi-card-heading me-2"></i>Enrollment No.</span>
+                        <span class="fw-semibold">{{ user.student_profile.enrollment_no }}</span>
+                    </div>
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <span class="text-muted"><i class="bi bi-mortarboard me-2"></i>Course / Program</span>
+                        <span class="fw-semibold">{{ user.student_profile.course }} (Sem {{ user.student_profile.semester }})</span>
+                    </div>
+                    <div class="list-group-item d-flex justify-content-between align-items-center bg-success-subtle">
+                        <span class="text-success fw-semibold"><i class="bi bi-wallet2 me-2"></i>Digital Wallet Balance</span>
+                        <span class="fw-bold text-success fs-5">₹{{ user.student_profile.wallet_balance }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="d-flex justify-content-center gap-2 mt-4">
+                    {% if user.is_student %}
+                    <a href="{% url 'menu:customer_menu' %}" class="btn btn-warning">
+                        <i class="bi bi-qr-code me-1"></i> Order Food
+                    </a>
+                    <a href="{% url 'orders:order_history' %}" class="btn btn-outline-secondary">
+                        <i class="bi bi-clock-history me-1"></i> My Orders
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

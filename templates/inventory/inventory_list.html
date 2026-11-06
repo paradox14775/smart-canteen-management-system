@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+
+{% block title %}Inventory & Stock Control - Smart Canteen{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="fw-bold mb-0"><i class="bi bi-boxes text-warning me-2"></i>Raw Material Inventory & Stock Control</h3>
+        <p class="text-muted small mb-0">Live ingredient balances with automatic recipe deduction and threshold monitoring.</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{% url 'inventory:recipes' %}" class="btn btn-outline-dark btn-sm">
+            <i class="bi bi-diagram-3 me-1"></i> Recipe BOM Mappings
+        </a>
+        <a href="{% url 'inventory:logs' %}" class="btn btn-outline-secondary btn-sm">
+            <i class="bi bi-journal-text me-1"></i> Stock Audit Logs
+        </a>
+    </div>
+</div>
+
+{% if notifications %}
+<div class="alert alert-danger shadow-sm mb-4" role="alert">
+    <h6 class="alert-heading fw-bold mb-2"><i class="bi bi-exclamation-triangle-fill me-2"></i>Active Low-Stock Warnings!</h6>
+    <ul class="mb-0 small">
+        {% for note in notifications %}
+            <li><strong>{{ note.title }}:</strong> {{ note.message }}</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
+
+<div class="row g-4">
+    <!-- Inward Purchase / Restock Form -->
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0 p-4">
+            <h5 class="fw-bold mb-3"><i class="bi bi-plus-circle text-success me-2"></i>Log Inward Restock</h5>
+            <form method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label class="form-label small fw-semibold">Select Raw Ingredient</label>
+                    <select name="ingredient_id" class="form-select" required>
+                        <option value="">-- Choose Ingredient --</option>
+                        {% for ing in ingredients %}
+                            <option value="{{ ing.id }}">{{ ing.name }} (Current: {{ ing.current_stock }} {{ ing.unit }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label small fw-semibold">Quantity Received</label>
+                    <input type="number" step="0.01" name="quantity" class="form-control" placeholder="e.g. 20.0" required>
+                </div>
+                <button type="submit" class="btn btn-success w-100 fw-semibold">
+                    <i class="bi bi-box-arrow-in-down me-1"></i> Add to Current Stock
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Inventory Table -->
+    <div class="col-md-8">
+        <div class="card shadow-sm border-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-3">Ingredient</th>
+                            <th>Unit</th>
+                            <th>Current Balance</th>
+                            <th>Safety Threshold</th>
+                            <th>Unit Cost</th>
+                            <th class="text-end pe-3">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for ing in ingredients %}
+                        <tr>
+                            <td class="ps-3 fw-bold">{{ ing.name }}</td>
+                            <td><span class="badge bg-light text-dark">{{ ing.get_unit_display }}</span></td>
+                            <td class="fw-bold fs-6 {% if ing.is_low_stock %}text-danger{% else %}text-success{% endif %}">
+                                {{ ing.current_stock }} {{ ing.unit }}
+                            </td>
+                            <td class="text-muted">{{ ing.minimum_threshold }} {{ ing.unit }}</td>
+                            <td>₹{{ ing.unit_cost }}</td>
+                            <td class="text-end pe-3">
+                                {% if ing.is_low_stock %}
+                                    <span class="badge bg-danger-subtle text-danger"><i class="bi bi-exclamation-circle me-1"></i>Low Stock</span>
+                                {% else %}
+                                    <span class="badge bg-success-subtle text-success"><i class="bi bi-check2 me-1"></i>Optimal</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center py-4 text-muted">No raw ingredients configured yet</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

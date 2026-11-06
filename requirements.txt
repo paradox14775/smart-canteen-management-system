@@ -1,0 +1,30 @@
+# Smart Canteen Management System - Python Dependencies
+# Target Environment: Python 3.11+ on Windows / Linux
+
+# Core Web Framework & REST API
+Django>=5.0.6,<5.2
+djangorestframework>=3.15.1
+django-cors-headers>=4.3.1
+
+# Database Connectivity (MySQL)
+# Note: On Windows, PyMySQL is included as a fallback if mysqlclient C++ build tools are unavailable
+mysqlclient>=2.2.4; sys_platform != "win32"
+pymysql>=1.1.0
+cryptography>=42.0.5
+
+# QR Code Generation & Image Processing
+qrcode[pil]>=7.4.2
+Pillow>=10.3.0
+
+# Machine Learning & Data Analytics
+scikit-learn>=1.4.2
+pandas>=2.2.2
+numpy>=1.26.4
+joblib>=1.4.0
+
+# Data Visualization & Chart Export
+matplotlib>=3.8.4
+
+# Development & Utility Tools
+python-dotenv>=1.0.1
+

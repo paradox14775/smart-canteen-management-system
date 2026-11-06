@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+
+{% block title %}Cafeteria Menu - Smart Canteen{% endblock %}
+
+{% block content %}
+<div class="row mb-3 align-items-center">
+    <div class="col-md-6">
+        <h3 class="fw-bold mb-1">
+            <i class="bi bi-cup-straw text-warning me-2"></i>Campus Cafeteria Menu
+        </h3>
+        <p class="text-muted small mb-0">Browse fresh dishes, customize portions, and order directly to your table.</p>
+    </div>
+    <div class="col-md-6 text-md-end mt-2 mt-md-0">
+        <span class="badge bg-dark p-2 fs-6">
+            <i class="bi bi-geo-alt-fill text-warning me-1"></i> Ordering for: <span class="text-warning">{{ table_number }}</span>
+        </span>
+    </div>
+</div>
+
+<!-- Search & Category Filters -->
+<div class="card border-0 bg-light p-3 mb-4">
+    <form method="get" class="row g-2 align-items-center">
+        {% if table_number %}
+            <input type="hidden" name="table" value="{{ table_number }}">
+        {% endif %}
+        <div class="col-md-6">
+            <div class="input-group">
+                <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
+                <input type="text" name="q" class="form-control border-start-0" placeholder="Search samosa, thali, coffee..." value="{{ search_query }}">
+            </div>
+        </div>
+        <div class="col-md-4">
+            <select name="category" class="form-select" onchange="this.form.submit()">
+                <option value="">All Categories</option>
+                {% for cat in categories %}
+                    <option value="{{ cat.id }}" {% if selected_category == cat.id|stringformat:"s" %}selected{% endif %}>
+                        {{ cat.name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-2 d-grid">
+            <button type="submit" class="btn btn-warning fw-semibold">Filter</button>
+        </div>
+    </form>
+</div>
+
+<!-- Food Items Grid -->
+<div class="row g-3 mb-5">
+    {% for product in products %}
+    <div class="col-6 col-md-4 col-lg-3">
+        <div class="card h-100 position-relative">
+            <div class="card-body p-3 d-flex flex-column">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <span class="badge bg-secondary-subtle text-secondary small">{{ product.category.name }}</span>
+                    <span class="badge bg-light text-muted small"><i class="bi bi-stopwatch me-1"></i>{{ product.preparation_time }}m</span>
+                </div>
+                
+                <h5 class="fw-bold mb-1 text-truncate" title="{{ product.name }}">{{ product.name }}</h5>
+                <p class="text-muted small flex-grow-1" style="font-size: 0.8rem; min-height: 2.4em;">
+                    {{ product.description|default:"Prepared fresh in campus kitchen with quality ingredients."|truncatechars:65 }}
+                </p>
+
+                <div class="d-flex justify-content-between align-items-center pt-2 border-top">
+                    <span class="fs-5 fw-bold text-dark">₹{{ product.price }}</span>
+                    {% if product.is_available %}
+                        <a href="{% url 'orders:add_to_cart' product.id %}" class="btn btn-sm btn-warning fw-semibold px-3">
+                            <i class="bi bi-plus-lg me-1"></i> Add
+                        </a>
+                    {% else %}
+                        <span class="badge bg-danger-subtle text-danger">Sold Out</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12 text-center py-5">
+        <i class="bi bi-emoji-neutral fs-1 text-muted d-block mb-2"></i>
+        <h5>No food items found</h5>
+        <p class="text-muted small">Try searching with a different term or clear the category filter.</p>
+        <a href="{% url 'menu:customer_menu' %}" class="btn btn-outline-secondary btn-sm">Reset Menu</a>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Sticky Bottom Floating Tray Bar -->
+<div class="fixed-bottom bg-white border-top shadow-lg py-2 px-3">
+    <div class="container-fluid px-lg-4 d-flex justify-content-between align-items-center">
+        <div>
+            <span class="fw-bold"><i class="bi bi-basket3-fill text-warning me-1"></i> Dining Tray</span>
+            <small class="text-muted d-none d-sm-inline ms-2">Table: {{ table_number }}</small>
+        </div>
+        <a href="{% url 'orders:cart_view' %}" class="btn btn-warning fw-bold px-4">
+            View Tray & Checkout <i class="bi bi-arrow-right ms-1"></i>
+        </a>
+    </div>
+</div>
+{% endblock %}

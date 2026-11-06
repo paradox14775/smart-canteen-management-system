@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+
+{% block title %}Order #{{ order.order_token }} - Smart Canteen{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center my-3">
+    <div class="col-lg-7">
+        <!-- Order Header Card -->
+        <div class="card shadow-sm border-0 mb-3 text-center p-4">
+            <span class="text-muted small text-uppercase fw-bold tracking-wider">Cafeteria Pickup Token</span>
+            <h1 class="display-4 fw-bold text-dark my-1">{{ order.order_token }}</h1>
+            <div>
+                {% if order.status == 'PENDING' %}
+                    <span class="badge bg-warning text-dark fs-6 px-3 py-2"><i class="bi bi-hourglass-split me-1"></i> Order Pending Kitchen Acceptance</span>
+                {% elif order.status == 'CONFIRMED' %}
+                    <span class="badge bg-info text-dark fs-6 px-3 py-2"><i class="bi bi-check2 me-1"></i> Confirmed & Ingredients Allocated</span>
+                {% elif order.status == 'PREPARING' %}
+                    <span class="badge bg-primary fs-6 px-3 py-2"><i class="bi bi-fire me-1"></i> Being Prepared in Kitchen</span>
+                {% elif order.status == 'READY' %}
+                    <span class="badge bg-success fs-6 px-3 py-2"><i class="bi bi-bell-fill me-1"></i> Ready for Collection at Counter!</span>
+                {% elif order.status == 'COMPLETED' %}
+                    <span class="badge bg-secondary fs-6 px-3 py-2"><i class="bi bi-check-all me-1"></i> Order Completed & Collected</span>
+                {% else %}
+                    <span class="badge bg-danger fs-6 px-3 py-2">Cancelled</span>
+                {% endif %}
+            </div>
+
+            <!-- Progress Tracker -->
+            <div class="mt-4 px-3">
+                <div class="progress" style="height: 10px;">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated 
+                        {% if order.status == 'PENDING' %}bg-warning w-25
+                        {% elif order.status == 'CONFIRMED' %}bg-info w-50
+                        {% elif order.status == 'PREPARING' %}bg-primary w-75
+                        {% elif order.status == 'READY' %}bg-success w-100
+                        {% elif order.status == 'COMPLETED' %}bg-secondary w-100
+                        {% else %}bg-danger w-100{% endif %}" 
+                        role="progressbar">
+                    </div>
+                </div>
+                <div class="d-flex justify-content-between text-muted small mt-2">
+                    <span>Submitted</span>
+                    <span>Confirmed</span>
+                    <span>Cooking</span>
+                    <span>Ready</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Receipt Summary -->
+        <div class="card shadow-sm border-0 p-4 mb-4">
+            <h5 class="fw-bold mb-3 border-bottom pb-2">Order Details</h5>
+            <div class="row text-muted small mb-3">
+                <div class="col-6">
+                    <p class="mb-1"><strong>Table / Station:</strong> {{ order.table_number }}</p>
+                    <p class="mb-1"><strong>Customer:</strong> {{ order.user.get_full_name|default:order.user.username }}</p>
+                </div>
+                <div class="col-6 text-end">
+                    <p class="mb-1"><strong>Time:</strong> {{ order.created_at|date:"d M Y, h:i A" }}</p>
+                    <p class="mb-1"><strong>Payment:</strong> {{ order.payment.get_payment_mode_display|default:"Simulated" }}</p>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>Dish</th>
+                            <th class="text-center">Qty</th>
+                            <th class="text-end">Price</th>
+                            <th class="text-end">Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in order.items.all %}
+                        <tr>
+                            <td>{{ item.product.name }}</td>
+                            <td class="text-center">{{ item.quantity }}</td>
+                            <td class="text-end">₹{{ item.unit_price }}</td>
+                            <td class="text-end">₹{{ item.subtotal }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th colspan="3" class="text-end">Grand Total:</th>
+                            <th class="text-end fs-6">₹{{ order.total_amount }}</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+
+            {% if order.notes %}
+            <div class="p-2 bg-light rounded small mt-2">
+                <strong>Kitchen Notes:</strong> {{ order.notes }}
+            </div>
+            {% endif %}
+
+            <div class="text-center mt-4">
+                <a href="{% url 'menu:customer_menu' %}" class="btn btn-warning me-2">
+                    <i class="bi bi-plus-circle me-1"></i> Order More Food
+                </a>
+                <a href="{% url 'orders:order_history' %}" class="btn btn-outline-secondary">
+                    <i class="bi bi-clock-history me-1"></i> Order History
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

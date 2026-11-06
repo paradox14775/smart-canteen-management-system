@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+
+{% block title %}My Dining Tray - Smart Canteen{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center my-3">
+    <div class="col-lg-8">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h3 class="fw-bold mb-0">
+                <i class="bi bi-cart3 text-warning me-2"></i>My Dining Tray
+            </h3>
+            <span class="badge bg-dark fs-6">
+                <i class="bi bi-geo-alt-fill text-warning me-1"></i> {{ table_number }}
+            </span>
+        </div>
+
+        {% if cart_items %}
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="table-responsive">
+                <table class="table align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th scope="col" class="ps-4">Item</th>
+                            <th scope="col" class="text-center">Price</th>
+                            <th scope="col" class="text-center">Quantity</th>
+                            <th scope="col" class="text-end pe-4">Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in cart_items %}
+                        <tr>
+                            <td class="ps-4">
+                                <span class="fw-bold d-block">{{ item.name }}</span>
+                            </td>
+                            <td class="text-center">₹{{ item.price }}</td>
+                            <td class="text-center">
+                                <div class="btn-group btn-group-sm">
+                                    <a href="{% url 'orders:remove_from_cart' item.product_id %}" class="btn btn-outline-secondary">
+                                        <i class="bi bi-dash"></i>
+                                    </a>
+                                    <span class="btn btn-outline-secondary disabled fw-bold text-dark px-3">{{ item.quantity }}</span>
+                                    <a href="{% url 'orders:add_to_cart' item.product_id %}" class="btn btn-outline-secondary">
+                                        <i class="bi bi-plus"></i>
+                                    </a>
+                                </div>
+                            </td>
+                            <td class="text-end pe-4 fw-bold">₹{{ item.subtotal }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot class="table-light">
+                        <tr>
+                            <td colspan="3" class="text-end fw-bold ps-4">Grand Total:</td>
+                            <td class="text-end pe-4 fw-bold fs-5 text-dark">₹{{ total_price }}</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+
+        <!-- Checkout Form -->
+        <div class="card shadow-sm border-0 p-4">
+            <h5 class="fw-bold mb-3"><i class="bi bi-credit-card-2-front text-primary me-2"></i>Checkout & Payment Selection</h5>
+            
+            <form action="{% url 'orders:checkout' %}" method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label class="form-label small fw-semibold">Special Instructions for Kitchen (Optional)</label>
+                    <input type="text" name="notes" class="form-control" placeholder="e.g. Less spicy, extra sauce, packing required">
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label small fw-semibold d-block">Choose Payment Method</label>
+                    <div class="row g-2">
+                        <div class="col-md-4">
+                            <input type="radio" class="btn-check" name="payment_mode" id="pay_upi" value="UPI_MOCK" checked>
+                            <label class="btn btn-outline-primary w-100 p-3 text-start" for="pay_upi">
+                                <i class="bi bi-qr-code-scan fs-4 d-block mb-1"></i>
+                                <strong>Simulated UPI</strong>
+                                <small class="d-block text-muted">GPay / Paytm Mock</small>
+                            </label>
+                        </div>
+                        <div class="col-md-4">
+                            <input type="radio" class="btn-check" name="payment_mode" id="pay_wallet" value="STUDENT_WALLET">
+                            <label class="btn btn-outline-success w-100 p-3 text-start" for="pay_wallet">
+                                <i class="bi bi-wallet2 fs-4 d-block mb-1"></i>
+                                <strong>Campus Wallet</strong>
+                                <small class="d-block text-muted">Student Smart ID</small>
+                            </label>
+                        </div>
+                        <div class="col-md-4">
+                            <input type="radio" class="btn-check" name="payment_mode" id="pay_cash" value="CASH">
+                            <label class="btn btn-outline-secondary w-100 p-3 text-start" for="pay_cash">
+                                <i class="bi bi-cash-stack fs-4 d-block mb-1"></i>
+                                <strong>Pay at Counter</strong>
+                                <small class="d-block text-muted">Cash settlement</small>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center">
+                    <a href="{% url 'menu:customer_menu' %}" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left me-1"></i> Add More Items
+                    </a>
+                    <button type="submit" class="btn btn-warning btn-lg fw-bold px-4">
+                        <i class="bi bi-check2-circle me-1"></i> Confirm & Place Order (₹{{ total_price }})
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        {% else %}
+        <div class="card shadow-sm border-0 p-5 text-center my-4">
+            <i class="bi bi-cart-x fs-1 text-muted mb-3"></i>
+            <h4 class="fw-bold">Your Tray is Empty</h4>
+            <p class="text-muted">Explore the cafeteria menu and add your favorite dishes.</p>
+            <div>
+                <a href="{% url 'menu:customer_menu' %}" class="btn btn-warning fw-semibold px-4">
+                    <i class="bi bi-cup-hot me-1"></i> Browse Menu
+                </a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

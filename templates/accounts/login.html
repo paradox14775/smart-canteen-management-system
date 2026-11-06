@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block title %}Login - Smart Canteen Management System{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center align-items-center my-4">
+    <div class="col-md-5 col-lg-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-4">
+                <div class="text-center mb-4">
+                    <div class="bg-warning-subtle text-warning d-inline-block p-3 rounded-circle mb-2">
+                        <i class="bi bi-shield-lock-fill fs-2"></i>
+                    </div>
+                    <h4 class="fw-bold">Sign In to Cafeteria</h4>
+                    <p class="text-muted small">Access QR Ordering, KDS, Admin, or Analytics</p>
+                </div>
+
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Username or Email</label>
+                        {{ form.username }}
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Password</label>
+                        {{ form.password }}
+                    </div>
+
+                    <button type="submit" class="btn btn-warning w-100 py-2 fw-semibold mb-3">
+                        <i class="bi bi-box-arrow-in-right me-1"></i> Sign In
+                    </button>
+                </form>
+
+                <div class="text-center mt-3 pt-3 border-top">
+                    <p class="small text-muted mb-1">New student to campus?</p>
+                    <a href="{% url 'accounts:register' %}" class="fw-semibold text-decoration-none">
+                        Create Student Account
+                    </a>
+                </div>
+
+                <div class="mt-4 p-3 bg-light rounded-3 small">
+                    <strong class="d-block mb-1 text-secondary">Demo Evaluator Logins:</strong>
+                    <div class="text-muted" style="font-size: 0.78rem;">
+                        <strong>Admin:</strong> <code>admin</code> / <code>admin123</code><br>
+                        <strong>Kitchen:</strong> <code>chef</code> / <code>chef123</code><br>
+                        <strong>Student:</strong> <code>student</code> / <code>student123</code><br>
+                        <strong>Analyst:</strong> <code>manager</code> / <code>manager123</code>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

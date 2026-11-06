@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Portal - Smart Canteen{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="fw-bold mb-0"><i class="bi bi-speedometer2 text-warning me-2"></i>Canteen Admin Console</h3>
+        <p class="text-muted small mb-0">Overview of cafeteria operations, quick actions, and transaction monitoring.</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{% url 'menu:table_qr_list' %}" class="btn btn-outline-dark btn-sm">
+            <i class="bi bi-qr-code me-1"></i> Print Table QRs
+        </a>
+        <a href="{% url 'inventory:list' %}" class="btn btn-warning btn-sm fw-semibold">
+            <i class="bi bi-boxes me-1"></i> Inward Restock
+        </a>
+    </div>
+</div>
+
+<!-- KPI Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card border-0 bg-primary text-white p-3">
+            <span class="small opacity-75">Gross Realized Revenue</span>
+            <h2 class="fw-bold my-1">₹{{ total_revenue }}</h2>
+            <small class="opacity-75"><i class="bi bi-cash-coin me-1"></i> Completed orders only</small>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-0 bg-dark text-white p-3">
+            <span class="small opacity-75">Total Orders Today</span>
+            <h2 class="fw-bold my-1">{{ today_orders_count }}</h2>
+            <small class="opacity-75"><i class="bi bi-receipt me-1"></i> All tables & takeaway</small>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-0 {% if low_stock_count > 0 %}bg-danger text-white{% else %}bg-success text-white{% endif %} p-3">
+            <span class="small opacity-75">Inventory Safety Alerts</span>
+            <h2 class="fw-bold my-1">{{ low_stock_count }}</h2>
+            <small class="opacity-75">
+                {% if low_stock_count > 0 %}
+                    <i class="bi bi-exclamation-triangle-fill me-1"></i> Ingredients breached safety stock
+                {% else %}
+                    <i class="bi bi-check-circle-fill me-1"></i> All stock levels optimal
+                {% endif %}
+            </small>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card border-0 bg-info text-white p-3">
+            <span class="small opacity-75">Kitchen Display State</span>
+            <h2 class="fw-bold my-1">Active</h2>
+            <small class="opacity-75"><i class="bi bi-display me-1"></i> KDS FIFO stream online</small>
+        </div>
+    </div>
+</div>
+
+<!-- Operational Tables -->
+<div class="row g-3">
+    <div class="col-lg-8">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                <h5 class="fw-bold mb-0">Recent Order Activity</h5>
+                <a href="{% url 'orders:kds_board' %}" class="btn btn-sm btn-outline-warning text-dark fw-semibold">
+                    Open KDS Stream <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-3">Token</th>
+                            <th>Time</th>
+                            <th>Customer</th>
+                            <th>Table</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in recent_orders %}
+                        <tr>
+                            <td class="ps-3 fw-bold">{{ order.order_token }}</td>
+                            <td class="small text-muted">{{ order.created_at|date:"h:i A" }}</td>
+                            <td>{{ order.user.username }}</td>
+                            <td><span class="badge bg-light text-dark">{{ order.table_number }}</span></td>
+                            <td class="fw-bold">₹{{ order.total_amount }}</td>
+                            <td>
+                                <span class="badge 
+                                    {% if order.status == 'PENDING' %}bg-warning text-dark
+                                    {% elif order.status == 'CONFIRMED' %}bg-info text-dark
+                                    {% elif order.status == 'PREPARING' %}bg-primary
+                                    {% elif order.status == 'READY' %}bg-success
+                                    {% elif order.status == 'COMPLETED' %}bg-secondary
+                                    {% else %}bg-danger{% endif %}">
+                                    {{ order.get_status_display }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center py-4 text-muted">No recent orders yet</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Navigation Card -->
+    <div class="col-lg-4">
+        <div class="card shadow-sm border-0 p-3 mb-3">
+            <h6 class="fw-bold mb-3"><i class="bi bi-grid-fill text-warning me-2"></i>Administration Hub</h6>
+            <div class="list-group list-group-flush">
+                <a href="{% url 'menu:table_qr_list' %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                    <span><i class="bi bi-qr-code-scan me-2 text-primary"></i>Generate Table QRs</span>
+                    <i class="bi bi-chevron-right text-muted"></i>
+                </a>
+                <a href="{% url 'inventory:list' %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                    <span><i class="bi bi-boxes me-2 text-success"></i>Ingredient Inventory</span>
+                    <i class="bi bi-chevron-right text-muted"></i>
+                </a>
+                <a href="{% url 'inventory:recipes' %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                    <span><i class="bi bi-diagram-3 me-2 text-warning"></i>Recipe BOM Mapping</span>
+                    <i class="bi bi-chevron-right text-muted"></i>
+                </a>
+                <a href="{% url 'inventory:logs' %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                    <span><i class="bi bi-journal-text me-2 text-secondary"></i>Stock Audit Transactions</span>
+                    <i class="bi bi-chevron-right text-muted"></i>
+                </a>
+                <a href="{% url 'analytics:dashboard' %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                    <span><i class="bi bi-graph-up me-2 text-info"></i>Sales & ML Demand Forecasting</span>
+                    <i class="bi bi-chevron-right text-muted"></i>
+                </a>
+                <a href="/admin/" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                    <span><i class="bi bi-shield-lock me-2 text-danger"></i>Full Django Admin</span>
+                    <i class="bi bi-chevron-right text-muted"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
