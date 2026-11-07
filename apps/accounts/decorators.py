@@ -45,3 +45,4 @@ def kitchen_required(view_func):
 
 def management_required(view_func):
     return role_required(['MANAGEMENT', 'ADMIN'])(view_func)
+

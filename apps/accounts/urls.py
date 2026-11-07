@@ -10,3 +10,4 @@ urlpatterns = [
     path('dashboard/', views.dashboard_redirect_view, name='dashboard'),
     path('profile/', views.profile_view, name='profile'),
 ]
+

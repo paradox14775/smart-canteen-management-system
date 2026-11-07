@@ -14,3 +14,4 @@ urlpatterns = [
     path('kds/update/<int:order_id>/', views.update_order_status_view, name='update_order_status'),
     path('admin-portal/', views.admin_dashboard_view, name='admin_dashboard'),
 ]
+

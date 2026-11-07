@@ -1,20 +1,32 @@
 # Python
 __pycache__/
 *.py[cod]
-*$py.class
-*.so
-.Python
-env/
+*.pyo
+
+# Virtual environments
+.venv/
+.venv-1/
 venv/
-ENV/
+env/
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
 
 # Django
+staticfiles/
+media/
 *.log
-local_settings.py
+
+# Local databases
 db.sqlite3
 db.sqlite3-journal
-media/qr_codes/*.png
 
 # IDE
 .vscode/
 .idea/
+
+# OS
+.DS_Store
+Thumbs.db

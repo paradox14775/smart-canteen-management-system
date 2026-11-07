@@ -8,3 +8,4 @@ urlpatterns = [
     path('recipes/', views.recipe_list_view, name='recipes'),
     path('logs/', views.stock_transactions_log_view, name='logs'),
 ]
+

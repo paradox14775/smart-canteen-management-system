@@ -8,3 +8,4 @@ urlpatterns = [
     path('manage/', views.admin_menu_manage_view, name='admin_menu_manage'),
     path('qr-codes/', views.table_qr_list_view, name='table_qr_list'),
 ]
+

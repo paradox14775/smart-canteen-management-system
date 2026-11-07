@@ -121,3 +121,4 @@ def train_and_forecast_demand():
         "forecast_date": tomorrow.strftime('%d-%b-%Y'),
         "results": results
     }
+

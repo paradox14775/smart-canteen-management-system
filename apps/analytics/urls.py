@@ -7,3 +7,4 @@ urlpatterns = [
     path('', views.analytics_dashboard_view, name='dashboard'),
     path('train-ml/', views.trigger_ml_training_view, name='train_ml'),
 ]
+
