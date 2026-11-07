@@ -47,6 +47,23 @@ CSRF_TRUSTED_ORIGINS = [
     if origin.strip()
 ]
 
+# Render provides this hostname automatically for deployed web services.
+RENDER_EXTERNAL_HOSTNAME = os.getenv('RENDER_EXTERNAL_HOSTNAME')
+if RENDER_EXTERNAL_HOSTNAME:
+    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
+    CSRF_TRUSTED_ORIGINS.append(
+        f'https://{RENDER_EXTERNAL_HOSTNAME}'
+    )
+
+# Render terminates HTTPS at its proxy.
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+if not DEBUG:
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_HSTS_SECONDS = 3600
+
 # Render HTTPS proxy support
 SECURE_PROXY_SSL_HEADER = (
     'HTTP_X_FORWARDED_PROTO', 'https'
